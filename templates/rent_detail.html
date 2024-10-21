@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ car.name }} - Mietbedingungen</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ car.image }}" class="img-fluid mb-4" alt="{{ car.name }}">
+            <h5>Mietpreis:</h5>
+            <p>{{ car.rental_price }}</p>
+
+            <h5>Verfügbare Mietlaufzeiten:</h5>
+            <ul>
+                {% for period in car.rental_period %}
+                <li>{{ period }} Jahre</li>
+                {% endfor %}
+            </ul>
+
+            <form action="" method="POST">
+                <div class="mb-3">
+                    <label for="rental_period" class="form-label">Wähle die Mietlaufzeit</label>
+                    <select class="form-select" id="rental_period" name="rental_period">
+                        {% for period in car.rental_period %}
+                        <option value="{{ period }}">{{ period }} Jahre</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Mieten</button>
+            </form>
+
+            <a href="{{ url_for('rent') }}" class="btn btn-secondary mt-3">Zurück zur Auswahl</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

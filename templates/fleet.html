@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Meine Elektrofahrzeuge</h1>
+    <div class="row">
+        {% for vehicle in vehicles %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{{ vehicle.image }}" class="card-img-top" alt="{{ vehicle.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ vehicle.name }}</h5>
+                    <p class="card-text">Kilometerstand: {{ vehicle.mileage }}</p>
+                    <p class="card-text">Batteriestatus: {{ vehicle.battery_status }}</p>
+                    <a href="{{ url_for('vehicle', vehicle_id=vehicle.id) }}" class="btn btn-primary">Details anzeigen</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

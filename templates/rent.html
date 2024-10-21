@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Verfügbare Fahrzeuge zur Miete</h1>
+    <div class="row">
+        {% for car in rental_cars %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{{ car.image }}" class="card-img-top" alt="{{ car.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ car.name }}</h5>
+                    <p class="card-text">Mietpreis: {{ car.rental_price }}</p>
+                    <a href="{{ url_for('rent_details', car_id=car.id) }}" class="btn btn-primary">Details anzeigen</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

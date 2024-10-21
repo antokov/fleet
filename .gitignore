@@ -1,0 +1,17 @@
+# Ignore Python cache and environment
+__pycache__/
+*.py[cod]
+*.pyo
+env/
+venv/
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore compiled code
+*.pyc
+
+# Ignore Flask/other environment variables
+instance/
+config.py
+.env

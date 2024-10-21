@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Willkommen im TCS Dashboard</h1>
+    <p>Hier sehen Sie Ihre Flottenstatistiken und Berichte.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Flottenübersicht</h5>
+                    <p class="card-text">Anzahl der Fahrzeuge: {{ vehicles|length }}</p>
+                    <a href="{{ url_for('fleet') }}" class="btn btn-primary">Zur Flottenübersicht</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
