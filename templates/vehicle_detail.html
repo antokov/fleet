@@ -2,32 +2,67 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>{{ vehicle.name }} - Details</h1>
+    <h1 class="mb-4">{{ vehicle.name }} - Details</h1>
     <div class="row">
+        <!-- Vehicle Image Card -->
         <div class="col-md-6">
-            <h5>Kilometerstand:</h5>
-            <p>{{ vehicle.mileage }}</p>
+            <div class="card mb-4">
+                <img src="{{ vehicle.image }}" class="card-img-top" alt="{{ vehicle.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ vehicle.name }}</h5>
+                    <p class="card-text">Kilometerstand: {{ vehicle.mileage }}</p>
+                </div>
+            </div>
+        </div>
 
-            <h5>Batteriestatus:</h5>
-            <p>{{ vehicle.battery_status }}</p>
+        <!-- Vehicle Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Fahrzeuginformationen</h5>
 
-            <h5>Letzter Service:</h5>
-            <p>{{ vehicle.last_service }}</p>
+                    <!-- Battery Status -->
+                    <h6 class="mt-3">Batteriestatus:</h6>
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ vehicle.battery_status|replace('%', '') }}%;" aria-valuenow="{{ vehicle.battery_status|replace('%', '') }}" aria-valuemin="0" aria-valuemax="100">{{ vehicle.battery_status }}</div>
+                    </div>
 
-            <h5>Fahrverhalten:</h5>
-            <p>{{ vehicle.driving_behavior }}</p>
+                    <!-- Driving Behavior -->
+                    <h6>Fahrverhalten:</h6>
+                    <div class="progress mb-3" style="height: 20px;">
+                        {% if vehicle.driving_behavior == 'Effizient' %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Effizient</div>
+                        {% elif vehicle.driving_behavior == 'Moderate' %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">Moderate</div>
+                        {% elif vehicle.driving_behavior == 'Sportlich' %}
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">Sportlich</div>
+                        {% else %}
+                            <div class="progress-bar bg-secondary" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Unbekannt</div>
+                        {% endif %}
+                    </div>
 
-            <h5>Durchschnittlicher Energieverbrauch:</h5>
-            <p>{{ vehicle.avg_consumption }}</p>
+                    <!-- Last and Next Service -->
+                    <h6>Letzter Service:</h6>
+                    <p>{{ vehicle.last_service }}</p>
 
-            <h5>Weitere interessante Daten:</h5>
-            <ul>
-                <li>Ladezyklen: {{ vehicle.charging_cycles or 'Noch nicht verfügbar' }}</li>
-                <li>Reifendruckstatus: {{ vehicle.tire_pressure_status or 'OK' }}</li>
-                <li>Verfügbarkeit für Fahrten: {{ vehicle.availability or 'Verfügbar' }}</li>
-            </ul>
+                    <h6>Nächster Service:</h6>
+                    <p>In {{ days_until_service }} Tagen</p>  <!-- Show days until next service -->
 
-            <a href="{{ url_for('fleet') }}" class="btn btn-secondary mt-3">Zurück zur Flotte</a>
+                    <!-- Average Consumption -->
+                    <h6>Durchschnittlicher Energieverbrauch:</h6>
+                    <p>{{ vehicle.avg_consumption }}</p>
+
+                    <!-- Additional Data -->
+                    <h6>Weitere interessante Daten:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Ladezyklen:</strong> {{ vehicle.charging_cycles or 'Noch nicht verfügbar' }}</li>
+                        <li><strong>Reifendruckstatus:</strong> {{ vehicle.tire_pressure_status or 'OK' }}</li>
+                        <li><strong>Verfügbarkeit für Fahrten:</strong> {{ vehicle.availability or 'Verfügbar' }}</li>
+                    </ul>
+
+                    <a href="{{ url_for('fleet') }}" class="btn btn-primary mt-3">Zurück zur Flotte</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

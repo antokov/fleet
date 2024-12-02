@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Dummy-Daten für Elektrofahrzeuge
+# Dummy data for fleet vehicles
 fleet_data = [
     {
         'id': 1,
@@ -10,9 +11,14 @@ fleet_data = [
         'mileage': '45,000 km',
         'battery_status': '80%',
         'last_service': '2024-01-10',
+        'next_service': '2024-07-10',
         'driving_behavior': 'Effizient',
         'avg_consumption': '14 kWh/100km',
-        'image': 'https://via.placeholder.com/300x200.png?text=Tesla+Model+3'
+        'image': 'https://via.placeholder.com/300x200.png?text=Tesla+Model+3',
+        'charging_cycles': None,
+        'tire_pressure_status': 'OK',
+        'availability': 'Verfügbar',
+        'utilization': 85
     },
     {
         'id': 2,
@@ -20,33 +26,28 @@ fleet_data = [
         'mileage': '30,000 km',
         'battery_status': '75%',
         'last_service': '2023-11-20',
+        'next_service': '2024-05-20',
         'driving_behavior': 'Moderate',
         'avg_consumption': '16 kWh/100km',
-        'image': 'https://via.placeholder.com/300x200.png?text=Nissan+Leaf'
-    },
-    {
-        'id': 3,
-        'name': 'Audi e-tron',
-        'mileage': '25,000 km',
-        'battery_status': '90%',
-        'last_service': '2024-02-01',
-        'driving_behavior': 'Sportlich',
-        'avg_consumption': '20 kWh/100km',
-        'image': 'https://via.placeholder.com/300x200.png?text=Audi+e-tron'
+        'image': 'https://via.placeholder.com/300x200.png?text=Nissan+Leaf',
+        'charging_cycles': None,
+        'tire_pressure_status': 'OK',
+        'availability': 'Verfügbar',
+        'utilization': 70
     }
 ]
 
-# Verfügbare Fahrzeuge zur Miete
+# Dummy data for rental cars
 rental_cars = [
     {
-        'id': 4,
+        'id': 3,
         'name': 'BMW i3',
         'image': 'https://via.placeholder.com/300x200.png?text=BMW+i3',
         'rental_price': '400 CHF/Monat',
         'rental_period': [1, 3, 5]  # Mietoptionen in Jahren
     },
     {
-        'id': 5,
+        'id': 4,
         'name': 'Mercedes EQC',
         'image': 'https://via.placeholder.com/300x200.png?text=Mercedes+EQC',
         'rental_price': '550 CHF/Monat',
@@ -56,7 +57,7 @@ rental_cars = [
 
 @app.route('/')
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', vehicles=fleet_data)
 
 @app.route('/fleet')
 def fleet():
@@ -66,7 +67,12 @@ def fleet():
 def vehicle(vehicle_id):
     vehicle = next((v for v in fleet_data if v['id'] == vehicle_id), None)
     if vehicle:
-        return render_template('vehicle_detail.html', vehicle=vehicle)
+        # Calculate days until next service
+        next_service_date = datetime.strptime(vehicle['next_service'], '%Y-%m-%d')
+        today = datetime.now()
+        days_until_service = (next_service_date - today).days
+
+        return render_template('vehicle_detail.html', vehicle=vehicle, days_until_service=days_until_service)
     return "Vehicle not found", 404
 
 @app.route('/rent')

@@ -4,16 +4,153 @@
 <div class="container mt-5">
     <h1>Willkommen im TCS Dashboard</h1>
     <p>Hier sehen Sie Ihre Flottenstatistiken und Berichte.</p>
+    
     <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+        <!-- Total Vehicles Tile -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Flottenübersicht</h5>
-                    <p class="card-text">Anzahl der Fahrzeuge: {{ vehicles|length }}</p>
-                    <a href="{{ url_for('fleet') }}" class="btn btn-primary">Zur Flottenübersicht</a>
+                    <h5 class="card-title">Gesamtfahrzeuge</h5>
+                    <p class="display-4">{{ vehicles|length }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Utilization Tile -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Fahrzeugnutzung</h5>
+                    <canvas id="vehicleUtilizationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental Period Distribution Tile -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Mietzeitraumverteilung</h5>
+                    <canvas id="rentalPeriodChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Service and Maintenance Overview Tile -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Service & Wartung</h5>
+                    <canvas id="serviceMaintenanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental Trends Tile -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Miettrends</h5>
+                    <canvas id="rentalTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Vehicle Daily Utilization Chart -->
+        <div class="col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Tägliche Fahrzeugauslastung</h5>
+                    <canvas id="dailyUtilizationChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Sample data for vehicle utilization
+    var vehicleNames = {{ vehicles | map(attribute='name') | list | tojson }};
+    var vehicleUtilization = {{ vehicles | map(attribute='utilization') | list | tojson }};
+
+    var vehicleUtilizationChart = new Chart(document.getElementById('vehicleUtilizationChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Stark genutzt', 'Mäßig genutzt', 'Selten genutzt'],
+            datasets: [{
+                data: [40, 35, 25], // Example data, adjust accordingly
+                backgroundColor: ['#007bff', '#28a745', '#ffc107']
+            }]
+        }
+    });
+
+    // Sample data for rental period distribution
+    var rentalPeriodChart = new Chart(document.getElementById('rentalPeriodChart'), {
+        type: 'bar',
+        data: {
+            labels: ['< 1 Jahr', '3 Jahre', '5 Jahre'],
+            datasets: [{
+                label: 'Anzahl Fahrzeuge',
+                data: [15, 45, 30], // Example data, adjust accordingly
+                backgroundColor: ['#17a2b8', '#6c757d', '#343a40']
+            }]
+        }
+    });
+
+    // Sample data for service and maintenance
+    var serviceMaintenanceChart = new Chart(document.getElementById('serviceMaintenanceChart'), {
+        type: 'line',
+        data: {
+            labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+            datasets: [{
+                label: 'Wartungstasks',
+                data: [5, 8, 4, 10, 12, 7, 9, 6, 8, 10, 11, 15], // Example data, adjust accordingly
+                borderColor: '#dc3545',
+                fill: false
+            }]
+        }
+    });
+
+    // Sample data for rental trends
+    var rentalTrendsChart = new Chart(document.getElementById('rentalTrendsChart'), {
+        type: 'line',
+        data: {
+            labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+            datasets: [{
+                label: 'Aktive Mieten',
+                data: [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85], // Example data, adjust accordingly
+                borderColor: '#28a745',
+                fill: true,
+                backgroundColor: 'rgba(40, 167, 69, 0.2)'
+            }]
+        }
+    });
+
+    // Vehicle Daily Utilization Chart
+    var dailyUtilizationChart = new Chart(document.getElementById('dailyUtilizationChart'), {
+        type: 'bar',
+        data: {
+            labels: vehicleNames,
+            datasets: [{
+                label: 'Prozent der Tage genutzt',
+                data: vehicleUtilization,
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

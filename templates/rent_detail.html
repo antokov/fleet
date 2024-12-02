@@ -25,11 +25,67 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Mieten</button>
+
+                <h5>Wähle ein Regalsystem</h5>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <input type="radio" id="rack_none" name="rack_option" value="none" class="d-none">
+                        <label for="rack_none" class="image-selector">
+                            <img src="{{ url_for('static', filename='img/none.jpg') }}" width="300" height="280" alt="None" class="img-thumbnail">
+                        </label>
+                        <p>None</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <input type="radio" id="rack_safety" name="rack_option" value="safety" class="d-none">
+                        <label for="rack_safety" class="image-selector">
+                            <img src="{{ url_for('static', filename='img/safety-1-300x280.jpg') }}" width="300" height="280" alt="Safety Rack" class="img-thumbnail">
+                        </label>
+                        <p>Safety</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <input type="radio" id="rack_professional" name="rack_option" value="professional" class="d-none">
+                        <label for="rack_professional" class="image-selector">
+                            <img src="{{ url_for('static', filename='img/professional-1-300x280.jpg') }}" width="300" height="280" alt="Professional Rack" class="img-thumbnail">
+                        </label>
+                        <p>Professional</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <input type="radio" id="rack_mobile" name="rack_option" value="mobile" class="d-none">
+                        <label for="rack_mobile" class="image-selector">
+                            <img src="{{ url_for('static', filename='img/mobile-1-300x280.jpg') }}" width="300" height="280" alt="Mobile Rack" class="img-thumbnail">
+                        </label>
+                        <p>Mobile</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <input type="radio" id="rack_light_shelf" name="rack_option" value="light_shelf" class="d-none">
+                        <label for="rack_light_shelf" class="image-selector">
+                            <img src="{{ url_for('static', filename='img/lightshelf-1-300x280.jpg') }}" width="300" height="280" alt="Light Shelf Rack" class="img-thumbnail">
+                        </label>
+                        <p>Light Shelf</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Mieten</button>
             </form>
 
             <a href="{{ url_for('rent') }}" class="btn btn-secondary mt-3">Zurück zur Auswahl</a>
         </div>
     </div>
 </div>
+
+<style>
+    .image-selector {
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.3s;
+    }
+    .image-selector img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    input[type="radio"]:checked + .image-selector {
+        border-color: #007bff;
+    }
+</style>
 {% endblock %}

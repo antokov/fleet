@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>099029e4-2647-44b7-bf61-3e8b81b9ec76</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>FleetManagementFlask.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +22,24 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FleetManagementFlask.py" />
+    <Folder Include="templates\" />
+    <Folder Include="static\" />
+    <Folder Include="static\css\" />
+    <Folder Include="static\js\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="static\css\style.css" />
+    <Content Include="templates\base.html" />
+    <Content Include="templates\dashboard.html" />
+    <Content Include="templates\fleet.html" />
+    <Content Include="templates\footer.html" />
+    <Content Include="templates\navigation.html" />
+    <Content Include="templates\rent.html" />
+    <Content Include="templates\rent_detail.html" />
+    <Content Include="templates\vehicle_detail.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="app.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
