@@ -2,22 +2,19 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Verfügbare Fahrzeuge zur Miete</h1>
+    <h1 class="mb-4">Available Vehicles for Rent</h1>
     <div class="row">
         {% for car in rental_cars %}
         <div class="col-md-4 mb-4">
-            <div class="card">
-                <img src="{{ car.image }}" class="card-img-top" alt="{{ car.name }}">
-                <div class="card-body">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ url_for('static', filename=car.image) }}" class="card-img-top img-fluid" alt="{{ car.name }}">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ car.name }}</h5>
-                    <p class="card-text">Preis: {{ car.rental_price }}</p>
-                    <h6>Mietlaufzeiten:</h6>
-                    <ul class="list-unstyled">
-                        {% for period in car.rental_period %}
-                        <li>{{ period }} Jahre</li>
-                        {% endfor %}
-                    </ul>
-                    <a href="{{ url_for('rent_details', car_id=car.id) }}" class="btn btn-primary">Details & Mieten</a>
+                    <p class="card-text">{{ car.description }}</p>
+                    <p class="text-primary fw-bold">Price: {{ car.rental_price }}</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('rent_details', car_id=car.id) }}" class="btn btn-primary w-100">Details & Rent</a>
+                    </div>
                 </div>
             </div>
         </div>

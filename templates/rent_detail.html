@@ -1,91 +1,226 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>{{ car.name }} - Mietbedingungen</h1>
+<div class="container mt-0">
     <div class="row">
-        <div class="col-md-6">
-            <img src="{{ car.image }}" class="img-fluid mb-4" alt="{{ car.name }}">
-            <h5>Mietpreis:</h5>
-            <p>{{ car.rental_price }}</p>
-
-            <h5>Verfügbare Mietlaufzeiten:</h5>
-            <ul>
-                {% for period in car.rental_period %}
-                <li>{{ period }} Jahre</li>
-                {% endfor %}
-            </ul>
-
-            <form action="" method="POST">
-                <div class="mb-3">
-                    <label for="rental_period" class="form-label">Wähle die Mietlaufzeit</label>
-                    <select class="form-select" id="rental_period" name="rental_period">
-                        {% for period in car.rental_period %}
-                        <option value="{{ period }}">{{ period }} Jahre</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <h5>Wähle ein Regalsystem</h5>
-                <div class="row">
-                    <div class="col-md-3 text-center">
-                        <input type="radio" id="rack_none" name="rack_option" value="none" class="d-none">
-                        <label for="rack_none" class="image-selector">
-                            <img src="{{ url_for('static', filename='img/none.jpg') }}" width="300" height="280" alt="None" class="img-thumbnail">
-                        </label>
-                        <p>None</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <input type="radio" id="rack_safety" name="rack_option" value="safety" class="d-none">
-                        <label for="rack_safety" class="image-selector">
-                            <img src="{{ url_for('static', filename='img/safety-1-300x280.jpg') }}" width="300" height="280" alt="Safety Rack" class="img-thumbnail">
-                        </label>
-                        <p>Safety</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <input type="radio" id="rack_professional" name="rack_option" value="professional" class="d-none">
-                        <label for="rack_professional" class="image-selector">
-                            <img src="{{ url_for('static', filename='img/professional-1-300x280.jpg') }}" width="300" height="280" alt="Professional Rack" class="img-thumbnail">
-                        </label>
-                        <p>Professional</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <input type="radio" id="rack_mobile" name="rack_option" value="mobile" class="d-none">
-                        <label for="rack_mobile" class="image-selector">
-                            <img src="{{ url_for('static', filename='img/mobile-1-300x280.jpg') }}" width="300" height="280" alt="Mobile Rack" class="img-thumbnail">
-                        </label>
-                        <p>Mobile</p>
-                    </div>
-                    <div class="col-md-3 text-center">
-                        <input type="radio" id="rack_light_shelf" name="rack_option" value="light_shelf" class="d-none">
-                        <label for="rack_light_shelf" class="image-selector">
-                            <img src="{{ url_for('static', filename='img/lightshelf-1-300x280.jpg') }}" width="300" height="280" alt="Light Shelf Rack" class="img-thumbnail">
-                        </label>
-                        <p>Light Shelf</p>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary mt-3">Mieten</button>
-            </form>
-
-            <a href="{{ url_for('rent') }}" class="btn btn-secondary mt-3">Zurück zur Auswahl</a>
+        <!-- Car Image -->
+        <div class="col-12">
+            <img src="{{ url_for('static', filename=car.image) }}" class="img-fluid mb-4 rounded" alt="{{ car.name }}">
         </div>
     </div>
+
+    <div class="row mb-4">
+        <!-- Car Description and Price in the Same Box -->
+        <div class="col-12">
+            <div class="car-details-box p-4 h-100 bg-light rounded d-flex justify-content-between align-items-center">
+                <div class="car-description">
+                    <h2 class="fw-bold mb-3">{{ car.name }}</h2>
+                    <p class="lead mb-0">{{ car.description }}</p>
+                </div>
+                <div class="price-box p-3 bg-white border rounded shadow-sm">
+                    <h4 class="mb-2 text-muted">Monthly Rental Rate</h4>
+                    <p class="price-text mb-0">{{ car.rental_price }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rental Period Selection -->
+    <div class="mb-4">
+        <label for="rental_period" class="form-label fw-bold">Select Rental Duration</label>
+        <select class="form-select" id="rental_period" name="rental_period">
+            {% for period in car.rental_period %}
+            <option value="{{ period }}">{{ period }} Years</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Rack System Options -->
+    <div class="accordion mb-4" id="rackAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header d-flex justify-content-between align-items-center">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRack">
+                    Choose a Shelving System
+                </button>
+                <span id="rackIndicator" class="tick-indicator d-none">&#10004;</span>
+            </h2>
+            <div id="collapseRack" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    {% for option in rack_options %}
+                    <div class="d-flex align-items-center mb-4">
+                        <input type="radio" id="rack_{{ option.value }}" name="rack_option" value="{{ option.value }}" class="d-none" onchange="updateRackIndicator()">
+                        <label for="rack_{{ option.value }}" class="image-selector me-3">
+                            <img src="{{ url_for('static', filename=option.image) }}" alt="{{ option.name }}" class="rack-img">
+                        </label>
+                        <div>
+                            <p class="fw-bold mb-1">{{ option.name }}</p>
+                            <p class="small mb-0">{{ option.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo Upload Options -->
+    <div class="accordion mb-4" id="logoAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header d-flex justify-content-between align-items-center">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLogo">
+                    Logo Upload Options
+                </button>
+                <span id="logoIndicator" class="tick-indicator d-none">&#10004;</span>
+            </h2>
+            <div id="collapseLogo" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <div class="mb-3">
+                        <label for="logo_upload" class="form-label">Upload Logo</label>
+                        <input type="file" class="form-control" id="logo_upload" name="logo_upload" accept="image/*" onchange="updateLogoIndicator()">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="logo_front" name="logo_position" value="front" onchange="updateLogoIndicator()">
+                        <label class="form-check-label" for="logo_front">Small Logo on the Front of the Vehicle</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="logo_side" name="logo_position" value="side" onchange="updateLogoIndicator()">
+                        <label class="form-check-label" for="logo_side">Logo on the Side of the Vehicle</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insurance Policy Options -->
+    <div class="accordion mb-4" id="insuranceAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header d-flex justify-content-between align-items-center">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInsurance">
+                    Insurance Policy
+                </button>
+                <span id="insuranceIndicator" class="tick-indicator d-none">&#10004;</span>
+            </h2>
+            <div id="collapseInsurance" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    <p class="mb-3">This rental includes basic insurance coverage which covers:</p>
+                    <ul>
+                        <li>Liability coverage for damages to third parties</li>
+                        <li>Basic collision damage protection</li>
+                        <li>Roadside assistance</li>
+                    </ul>
+                    <p class="fw-bold mt-4">Optional Additions:</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="theft_protection" name="insurance_option" value="theft_protection" onchange="updateInsuranceIndicator()">
+                        <label class="form-check-label" for="theft_protection">Theft Protection (+ 10 CHF/month)</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="collision_waiver" name="insurance_option" value="collision_waiver" onchange="updateInsuranceIndicator()">
+                        <label class="form-check-label" for="collision_waiver">Collision Damage Waiver (+ 15 CHF/month)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <form action="" method="POST">
+        <button type="submit" class="btn btn-success btn-lg w-100 mb-5">Rent Now</button>
+    </form>
 </div>
 
 <style>
+    .car-details-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .car-description {
+        font-size: 1.1rem;
+        color: #555;
+        flex: 1;
+    }
+
+    .price-box {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        padding: 12px;
+        min-width: 250px;
+    }
+
+    .price-box h5 {
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: normal;
+    }
+
+    .price-text {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin: 0;
+    }
+
     .image-selector {
+        width: 160px;
+        height: 160px;
         cursor: pointer;
         border: 2px solid transparent;
         transition: border-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .image-selector img {
+
+    .rack-img {
         width: 100%;
-        height: auto;
+        height: 100%;
         object-fit: cover;
     }
+
     input[type="radio"]:checked + .image-selector {
         border-color: #007bff;
     }
+
+    .tick-indicator {
+        color: green;
+        font-size: 1.5rem;
+        margin: 8px 10px 8px 0;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        font-size: 1.2rem;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .mb-5 {
+        margin-bottom: 3rem;
+    }
 </style>
+
+
+<script>
+    function updateRackIndicator() {
+        const selectedOption = document.querySelector('input[name="rack_option"]:checked');
+        document.getElementById('rackIndicator').classList.toggle('d-none', !selectedOption || selectedOption.value === 'none');
+    }
+
+    function updateLogoIndicator() {
+        const file = document.getElementById('logo_upload').value;
+        const logoFront = document.getElementById('logo_front').checked;
+        const logoSide = document.getElementById('logo_side').checked;
+        document.getElementById('logoIndicator').classList.toggle('d-none', !file && !logoFront && !logoSide);
+    }
+
+    function updateInsuranceIndicator() {
+        const theftProtection = document.getElementById('theft_protection').checked;
+        const collisionWaiver = document.getElementById('collision_waiver').checked;
+        document.getElementById('insuranceIndicator').classList.toggle('d-none', !theftProtection && !collisionWaiver);
+    }
+</script>
 {% endblock %}

@@ -2,145 +2,171 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Willkommen im TCS Dashboard</h1>
-    <p>Hier sehen Sie Ihre Flottenstatistiken und Berichte.</p>
-    
+    <h1 class="mb-4">Fleet Management Dashboard</h1>
+
+    <!-- Fleet Overview Tiles -->
     <div class="row">
-        <!-- Total Vehicles Tile -->
+        <!-- Total Vehicles -->
         <div class="col-md-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Gesamtfahrzeuge</h5>
+                    <h5 class="card-title">Total Vehicles</h5>
                     <p class="display-4">{{ vehicles|length }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Vehicle Utilization Tile -->
+        <!-- Available Vehicles -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card h-100 text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Fahrzeugnutzung</h5>
-                    <canvas id="vehicleUtilizationChart"></canvas>
+                    <h5 class="card-title">Available Vehicles</h5>
+                    <p class="display-4">{{ vehicles | selectattr('availability', 'equalto', 'Available') | list | length }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Rental Period Distribution Tile -->
+        <!-- Vehicles in Use -->
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card h-100 text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Mietzeitraumverteilung</h5>
-                    <canvas id="rentalPeriodChart"></canvas>
+                    <h5 class="card-title">Vehicles in Use</h5>
+                    <p class="display-4">{{ vehicles | selectattr('availability', 'equalto', 'In Use') | list | length }}</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Battery Status and Mileage Distribution -->
     <div class="row">
-        <!-- Service and Maintenance Overview Tile -->
+        <!-- Battery Status Distribution -->
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Service & Wartung</h5>
-                    <canvas id="serviceMaintenanceChart"></canvas>
+                    <h5 class="card-title">Battery Status Distribution</h5>
+                    <canvas id="batteryStatusChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Rental Trends Tile -->
+        <!-- Mileage Distribution -->
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Miettrends</h5>
-                    <canvas id="rentalTrendsChart"></canvas>
+                    <h5 class="card-title">Mileage Distribution</h5>
+                    <canvas id="mileageDistributionChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <!-- Vehicle Daily Utilization Chart -->
+    <!-- Upcoming and Overdue Maintenance -->
+    <div class="row">
+        <!-- Upcoming Services -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Services</h5>
+                    <ul class="list-group">
+                        {% for vehicle in vehicles if vehicle.days_until_service <= 30 %}
+                            <li class="list-group-item">
+                                <strong>{{ vehicle.name }}</strong> - Next Service in {{ vehicle.days_until_service }} days
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overdue Maintenance -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Overdue Maintenance</h5>
+                    <ul class="list-group">
+                        {% for vehicle in vehicles if vehicle.days_until_service < 0 %}
+                            <li class="list-group-item">
+                                <strong>{{ vehicle.name }}</strong> - Overdue by {{ vehicle.days_until_service | abs }} days
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accident Reports Overview -->
+    <div class="row">
         <div class="col-md-12 mb-4">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Tägliche Fahrzeugauslastung</h5>
-                    <canvas id="dailyUtilizationChart"></canvas>
+                    <h5 class="card-title">Accident Reports</h5>
+                    <ul class="list-group">
+                        {% for vehicle in vehicles %}
+                            {% for accident in vehicle.accident_history %}
+                                <li class="list-group-item">
+                                    <strong>{{ vehicle.name }}</strong> - {{ accident.date }}: {{ accident.description }}
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Potential Cost Savings Areas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-currency-dollar me-2"></i>Potential Cost Savings Areas</h5>
+                    <ul class="list-group">
+                        {% for vehicle in vehicles %}
+                            {% if vehicle.battery_status|replace('%', '')|int < 50 %}
+                                <li class="list-group-item">
+                                    <strong>{{ vehicle.name }}:</strong> Battery is below 50%. Optimize charging schedules to reduce energy costs.
+                                </li>
+                            {% endif %}
+
+                            {% if vehicle.mileage|replace(' km', '')|replace(',', '')|int > 25000 %}
+                                <li class="list-group-item">
+                                    <strong>{{ vehicle.name }}:</strong> High mileage detected. Consider scheduling maintenance to avoid costly repairs.
+                                </li>
+                            {% endif %}
+
+                            {% if vehicle.accident_history and vehicle.accident_history|length > 1 %}
+                                <li class="list-group-item">
+                                    <strong>{{ vehicle.name }}:</strong> Multiple accident reports. Recommend driver training to reduce insurance costs.
+                                </li>
+                            {% endif %}
+
+                            {% if vehicle.efficiency|int < 80 %}
+                                <li class="list-group-item">
+                                    <strong>{{ vehicle.name }}:</strong> Efficiency below 80%. Review driving behavior to improve fuel or energy efficiency.
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    // Sample data for vehicle utilization
-    var vehicleNames = {{ vehicles | map(attribute='name') | list | tojson }};
-    var vehicleUtilization = {{ vehicles | map(attribute='utilization') | list | tojson }};
-
-    var vehicleUtilizationChart = new Chart(document.getElementById('vehicleUtilizationChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Stark genutzt', 'Mäßig genutzt', 'Selten genutzt'],
-            datasets: [{
-                data: [40, 35, 25], // Example data, adjust accordingly
-                backgroundColor: ['#007bff', '#28a745', '#ffc107']
-            }]
-        }
-    });
-
-    // Sample data for rental period distribution
-    var rentalPeriodChart = new Chart(document.getElementById('rentalPeriodChart'), {
+    // Battery Status Chart
+    var batteryStatusChart = new Chart(document.getElementById('batteryStatusChart'), {
         type: 'bar',
         data: {
-            labels: ['< 1 Jahr', '3 Jahre', '5 Jahre'],
+            labels: {{ vehicles | map(attribute='name') | list | tojson }},
             datasets: [{
-                label: 'Anzahl Fahrzeuge',
-                data: [15, 45, 30], // Example data, adjust accordingly
-                backgroundColor: ['#17a2b8', '#6c757d', '#343a40']
-            }]
-        }
-    });
-
-    // Sample data for service and maintenance
-    var serviceMaintenanceChart = new Chart(document.getElementById('serviceMaintenanceChart'), {
-        type: 'line',
-        data: {
-            labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-            datasets: [{
-                label: 'Wartungstasks',
-                data: [5, 8, 4, 10, 12, 7, 9, 6, 8, 10, 11, 15], // Example data, adjust accordingly
-                borderColor: '#dc3545',
-                fill: false
-            }]
-        }
-    });
-
-    // Sample data for rental trends
-    var rentalTrendsChart = new Chart(document.getElementById('rentalTrendsChart'), {
-        type: 'line',
-        data: {
-            labels: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-            datasets: [{
-                label: 'Aktive Mieten',
-                data: [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85], // Example data, adjust accordingly
-                borderColor: '#28a745',
-                fill: true,
-                backgroundColor: 'rgba(40, 167, 69, 0.2)'
-            }]
-        }
-    });
-
-    // Vehicle Daily Utilization Chart
-    var dailyUtilizationChart = new Chart(document.getElementById('dailyUtilizationChart'), {
-        type: 'bar',
-        data: {
-            labels: vehicleNames,
-            datasets: [{
-                label: 'Prozent der Tage genutzt',
-                data: vehicleUtilization,
-                backgroundColor: '#007bff'
+                label: 'Battery Status (%)',
+                data: {{ vehicles | map(attribute='battery_status') | map('replace', '%', '') | map('int') | list | tojson }},
+                backgroundColor: '#28a745'
             }]
         },
         options: {
@@ -148,6 +174,26 @@
                 y: {
                     beginAtZero: true,
                     max: 100
+                }
+            }
+        }
+    });
+
+    // Mileage Distribution Chart
+    var mileageDistributionChart = new Chart(document.getElementById('mileageDistributionChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ vehicles | map(attribute='name') | list | tojson }},
+            datasets: [{
+                label: 'Mileage (km)',
+                data: {{ vehicles | map(attribute='mileage') | map('replace', ' km', '') | map('replace', ',', '') | map('int') | list | tojson }},
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
         }
